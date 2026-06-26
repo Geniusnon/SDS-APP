@@ -34,18 +34,29 @@
     
     .content-container { max-width: 600px; margin: auto; padding: 0 15px 50px; }
     
-    .card-chem { background: white; border-radius: 16px; margin-bottom: 15px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border-left: 6px solid var(--primary); }
-    .chem-header { display: flex; flex-direction: column; width: 100%; gap: 5px;}
-    .chem-name { font-weight: 500; font-size: 1.2rem; color: var(--primary); margin: 0; line-height: 1.2;}
-    .chem-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 5px; }
-    .badge-brand { background-color: #e2e8f0; color: #4a5568; font-weight: 500; padding: 5px 10px; border-radius: 8px; font-size: 0.8rem; }
-    .badge-type { background-color: #e6f6ff; color: #0284c7; font-weight: 500; padding: 5px 10px; border-radius: 8px; font-size: 0.8rem; }
+    /* --- ปรับแต่งการ์ดรายชื่อใหม่ ให้ดูคลีนและกดได้ --- */
+    .card-chem { 
+      background: white; 
+      border-radius: 16px; 
+      margin-bottom: 12px; 
+      padding: 18px 20px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04); 
+      border-left: 6px solid var(--primary); 
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .card-chem:active { transform: scale(0.98); background-color: #f8f9fa; }
+    .chem-name { font-weight: 500; font-size: 1.15rem; color: var(--primary); margin: 0; line-height: 1.2;}
+    .chem-icon { color: #cbd5e0; font-size: 1.2rem; font-weight: bold;}
     
-    .action-group { display: flex; gap: 8px; width: 100%; margin-top: 5px; }
-    .btn-view { flex: 1; border-radius: 12px; background-color: var(--primary); color: white; border: none; padding: 10px; font-weight: 500; }
-    .btn-edit { background-color: #fff3cd; color: #856404; border: none; border-radius: 12px; padding: 10px 15px; font-weight: 500; display: none; }
-    .btn-delete { background-color: #ffe5e5; color: #dc3545; border: none; border-radius: 12px; padding: 10px 15px; font-weight: 500; display: none; }
+    /* ป้าย Tag สำหรับหน้า Detail */
+    .badge-brand { background-color: #e2e8f0; color: #4a5568; font-weight: 500; padding: 6px 12px; border-radius: 8px; font-size: 0.9rem; display: inline-block; }
+    .badge-type { background-color: #e6f6ff; color: #0284c7; font-weight: 500; padding: 6px 12px; border-radius: 8px; font-size: 0.9rem; display: inline-block; }
     
+    /* UI ยิบย่อย */
     .modal-pdf .modal-dialog { width: 100%; height: 100%; margin: 0; padding: 0; max-width: none; }
     .modal-pdf .modal-content { height: 100%; border-radius: 0; background-color: #333; }
     .modal-pdf .modal-header { background-color: #111; color: white; padding: 15px; }
@@ -94,32 +105,41 @@
 
     <div class="content-container">
       <div id="loader"><div class="spinner-border text-primary" role="status"></div><div class="mt-2 text-muted">กำลังดึงข้อมูล...</div></div>
+      
       <div id="chemicalList"></div>
 
       <div class="admin-section card p-4 mt-4" id="adminPanel" style="border-radius: 16px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
         <h5 style="font-weight: 600; color: var(--primary); margin-bottom: 20px;">➕ อัปโหลดสารเคมีใหม่</h5>
         <form id="uploadForm" onsubmit="handleUpload(event)">
-          <div class="mb-3">
-            <label class="form-label small text-muted mb-1">ชื่อสารเคมี</label>
-            <input type="text" id="chemName" class="form-control" style="border-radius: 10px;" required>
-          </div>
+          <div class="mb-3"><label class="form-label small text-muted mb-1">ชื่อสารเคมี</label><input type="text" id="chemName" class="form-control" style="border-radius: 10px;" required></div>
           <div class="row mb-3">
-            <div class="col-6">
-              <label class="form-label small text-muted mb-1">ยี่ห้อ (Brand)</label>
-              <input type="text" id="chemBrand" class="form-control" style="border-radius: 10px;" required>
-            </div>
-            <div class="col-6">
-              <label class="form-label small text-muted mb-1">ประเภทการใช้งาน</label>
-              <input type="text" id="chemType" class="form-control" style="border-radius: 10px;" required>
-            </div>
+            <div class="col-6"><label class="form-label small text-muted mb-1">ยี่ห้อ (Brand)</label><input type="text" id="chemBrand" class="form-control" style="border-radius: 10px;" required></div>
+            <div class="col-6"><label class="form-label small text-muted mb-1">ประเภทการใช้งาน</label><input type="text" id="chemType" class="form-control" style="border-radius: 10px;" required></div>
           </div>
-          <div class="mb-4">
-            <label class="form-label small text-muted mb-1">ไฟล์เอกสาร (PDF)</label>
-            <input type="file" id="pdfFile" class="form-control" accept="application/pdf" style="border-radius: 10px;" required>
-          </div>
+          <div class="mb-4"><label class="form-label small text-muted mb-1">ไฟล์เอกสาร (PDF)</label><input type="file" id="pdfFile" class="form-control" accept="application/pdf" style="border-radius: 10px;" required></div>
           <button type="submit" class="btn btn-primary w-100" id="submitBtn" style="border-radius: 12px; padding: 12px; font-weight: 500;">บันทึกและอัปโหลด PDF</button>
         </form>
         <div id="statusMessage" class="alert d-none mt-3 mb-0 text-center rounded-3"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="border-radius: 20px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+        <div class="modal-header bg-light" style="border-radius: 20px 20px 0 0; border-bottom: none;">
+          <h5 class="modal-title" style="font-weight: 600; color: var(--primary);">ข้อมูลสารเคมี</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4 text-center">
+          <h3 id="detailName" style="color: var(--primary); font-weight: 600; margin-bottom: 15px;">ชื่อสารเคมี</h3>
+          <div class="d-flex justify-content-center gap-2 mb-4">
+            <span class="badge-brand" id="detailBrand">🏢 Brand</span>
+            <span class="badge-type" id="detailType">⚙️ Type</span>
+          </div>
+          
+          <div id="detailActions" class="d-flex flex-column gap-2"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -134,19 +154,10 @@
         <div class="modal-body p-4">
           <form id="editForm" onsubmit="handleUpdate(event)">
             <input type="hidden" id="editId">
-            <div class="mb-3">
-              <label class="form-label small text-muted mb-1">ชื่อสารเคมี</label>
-              <input type="text" id="editName" class="form-control" style="border-radius: 10px;" required>
-            </div>
+            <div class="mb-3"><label class="form-label small text-muted mb-1">ชื่อสารเคมี</label><input type="text" id="editName" class="form-control" style="border-radius: 10px;" required></div>
             <div class="row mb-3">
-              <div class="col-6">
-                <label class="form-label small text-muted mb-1">ยี่ห้อ (Brand)</label>
-                <input type="text" id="editBrand" class="form-control" style="border-radius: 10px;" required>
-              </div>
-              <div class="col-6">
-                <label class="form-label small text-muted mb-1">ประเภทการใช้งาน</label>
-                <input type="text" id="editType" class="form-control" style="border-radius: 10px;" required>
-              </div>
+              <div class="col-6"><label class="form-label small text-muted mb-1">ยี่ห้อ (Brand)</label><input type="text" id="editBrand" class="form-control" style="border-radius: 10px;" required></div>
+              <div class="col-6"><label class="form-label small text-muted mb-1">ประเภทการใช้งาน</label><input type="text" id="editType" class="form-control" style="border-radius: 10px;" required></div>
             </div>
             <div class="mb-4 p-3 bg-light" style="border-radius: 10px;">
               <label class="form-label small text-muted mb-1">เปลี่ยนไฟล์ SDS (PDF) ใหม่</label>
@@ -262,41 +273,17 @@
       if(data.length === 0) return listDiv.innerHTML = `<div class="text-center text-muted my-4 p-4 bg-white" style="border-radius:15px;">ไม่พบข้อมูล</div>`;
 
       data.forEach(item => {
-        const displayAdmin = currentRole === 'admin' ? 'block' : 'none';
-        
-        // Escape quotes สำหรับป้องกัน Error เมื่อส่งข้อมูลผ่านฟังก์ชัน
+        // Escape quotes เพื่อป้องกัน Error
         const safeName = item.name.replace(/'/g, "\\'");
         const safeBrand = item.brand.replace(/'/g, "\\'");
         const safeType = item.type.replace(/'/g, "\\'");
+        const safeUrl = item.url ? item.url : '';
 
-        let actionHtml = `<button class="btn btn-secondary w-100" disabled style="border-radius:12px;">รอนำเข้าไฟล์ SDS</button>`;
-        
-        if (item.url) {
-          actionHtml = `
-            <div class="action-group">
-              <button class="btn-view" onclick="openPdf('${item.url}', '${safeName}')">📄 ดู SDS</button>
-              <button class="btn-edit" style="display: ${displayAdmin};" onclick="openEditModal('${item.id}', '${safeName}', '${safeBrand}', '${safeType}')">✏️</button>
-              <button class="btn-delete" style="display: ${displayAdmin};" onclick="deleteData('${item.id}', '${safeName}')">🗑️</button>
-            </div>`;
-        } else if (currentRole === 'admin') {
-           actionHtml = `
-            <div class="action-group">
-              <button class="btn btn-secondary" disabled style="flex:1; border-radius:12px;">ไม่มีไฟล์ PDF</button>
-              <button class="btn-edit" style="display: block;" onclick="openEditModal('${item.id}', '${safeName}', '${safeBrand}', '${safeType}')">✏️</button>
-              <button class="btn-delete" style="display: block;" onclick="deleteData('${item.id}', '${safeName}')">🗑️</button>
-            </div>`;
-        }
-
+        // การ์ดแบบคลีน มีแค่ชื่อสารเคมี เมื่อกดจะเรียก openDetailModal
         const card = `
-          <div class="card-chem">
-            <div class="chem-header">
-              <h3 class="chem-name">${item.name}</h3>
-              <div class="chem-badges">
-                <span class="badge-brand">🏢 ${item.brand}</span>
-                <span class="badge-type">⚙️ ${item.type}</span>
-              </div>
-            </div>
-            ${actionHtml}
+          <div class="card-chem" onclick="openDetailModal('${item.id}', '${safeName}', '${safeBrand}', '${safeType}', '${safeUrl}')">
+            <h3 class="chem-name">${item.name}</h3>
+            <span class="chem-icon">›</span>
           </div>`;
         listDiv.innerHTML += card;
       });
@@ -315,19 +302,59 @@
       displayData(filtered);
     }
 
-    // ฟังก์ชันเปิดหน้าต่างแก้ไขข้อมูล
-    function openEditModal(id, name, brand, type) {
+    // ==========================================
+    // ฟังก์ชันเปิดหน้าต่างรายละเอียดสารเคมี (ใหม่)
+    // ==========================================
+    function openDetailModal(id, name, brand, type, url) {
+      document.getElementById('detailName').innerText = name;
+      document.getElementById('detailBrand').innerText = '🏢 ' + brand;
+      document.getElementById('detailType').innerText = '⚙️ ' + type;
+
+      let actionHtml = '';
+
+      // ปุ่มดูเอกสาร (มีหรือไม่มีไฟล์)
+      if (url) {
+        actionHtml += `<button class="btn btn-primary w-100 mb-2" style="border-radius:12px; padding: 12px; font-weight: 500;" onclick="openPdf('${url}', '${name}')">📄 ดูเอกสาร SDS</button>`;
+      } else {
+        actionHtml += `<button class="btn btn-secondary w-100 mb-2" disabled style="border-radius:12px; padding: 12px; font-weight: 500;">⚠️ รอนำเข้าไฟล์ SDS</button>`;
+      }
+
+      // ถ้าเป็น Admin โชว์ปุ่มแก้ไขและลบเพิ่ม
+      if (currentRole === 'admin') {
+        actionHtml += `
+          <div class="d-flex gap-2">
+            <button class="btn flex-fill" style="background-color: #fff3cd; color: #856404; border-radius: 12px; padding: 10px; font-weight: 500;" onclick="openEditFromDetail('${id}', '${name}', '${brand}', '${type}')">✏️ แก้ไข</button>
+            <button class="btn flex-fill" style="background-color: #ffe5e5; color: #dc3545; border-radius: 12px; padding: 10px; font-weight: 500;" onclick="deleteData('${id}', '${name}')">🗑️ ลบ</button>
+          </div>
+        `;
+      }
+
+      document.getElementById('detailActions').innerHTML = actionHtml;
+      
+      const detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
+      detailModal.show();
+    }
+
+    // สลับจากหน้า Detail ไปหน้า Edit
+    function openEditFromDetail(id, name, brand, type) {
+      // ปิดหน้าต่าง Detail ก่อน
+      const detailModalEl = document.getElementById('detailModal');
+      const detailModal = bootstrap.Modal.getInstance(detailModalEl);
+      if(detailModal) detailModal.hide();
+      
+      // เอาค่าไปใส่ในฟอร์มแก้ไข
       document.getElementById('editId').value = id;
       document.getElementById('editName').value = name;
       document.getElementById('editBrand').value = brand;
       document.getElementById('editType').value = type;
-      document.getElementById('editPdfFile').value = ''; // เคลียร์ช่องไฟล์เก่า
+      document.getElementById('editPdfFile').value = ''; 
       
-      const editModal = new bootstrap.Modal(document.getElementById('editModal'));
-      editModal.show();
+      // เปิดหน้าต่าง Edit
+      setTimeout(() => {
+        new bootstrap.Modal(document.getElementById('editModal')).show();
+      }, 300); // ดีเลย์นิดหน่อยให้ Popup ตัวเก่าปิดสนิทก่อน
     }
 
-    // ฟังก์ชันส่งข้อมูลอัปเดตไปที่ Server
     async function handleUpdate(event) {
       event.preventDefault();
       const btn = document.getElementById('updateBtn');
@@ -375,13 +402,17 @@
           sendUpdate(payload);
         };
         reader.readAsDataURL(fileInput);
-      } else {
-        sendUpdate(payload); // ส่งแค่ข้อความ ไม่ส่งไฟล์ใหม่
-      }
+      } else { sendUpdate(payload); }
     }
 
     async function deleteData(id, name) {
       if(!confirm(`⚠️ ต้องการลบข้อมูลของ "${name}" ใช่หรือไม่?`)) return;
+      
+      // ถ้าลบจากหน้า Detail ให้ปิดหน้าต่าง Detail ด้วย
+      const detailModalEl = document.getElementById('detailModal');
+      const detailModal = bootstrap.Modal.getInstance(detailModalEl);
+      if(detailModal) detailModal.hide();
+
       document.getElementById('loader').style.display = 'block';
       try {
         const response = await fetch(GAS_API_URL, { method: 'POST', body: JSON.stringify({ action: "delete", id: id }), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
@@ -392,10 +423,19 @@
     }
 
     function openPdf(url, name) {
+      // ซ่อนหน้า Detail ก่อนเปิด PDF
+      const detailModalEl = document.getElementById('detailModal');
+      const detailModal = bootstrap.Modal.getInstance(detailModalEl);
+      if(detailModal) detailModal.hide();
+
       document.getElementById('pdfModalTitle').innerText = name;
       document.getElementById('pdfFrame').src = url; 
-      new bootstrap.Modal(document.getElementById('pdfModal')).show();
+      
+      setTimeout(() => {
+        new bootstrap.Modal(document.getElementById('pdfModal')).show();
+      }, 300);
     }
+    
     function closePdf() { document.getElementById('pdfFrame').src = ""; }
 
     async function handleUpload(event) {
