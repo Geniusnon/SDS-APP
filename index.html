@@ -80,8 +80,9 @@
     .role-btn-main { background-color: white; color: var(--primary); }
     .role-btn-admin { background-color: rgba(255,159,28,0.95); color: white; box-shadow: none; }
     .role-btn .left { display: flex; align-items: center; gap: 14px; }
-    .role-icon { font-size: 1.55rem; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 14px; background: rgba(10,37,64,.08); }
+    .role-icon { font-size: 1.55rem; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 14px; background: rgba(10,37,64,.08); flex-shrink: 0; }
     .role-btn-admin .role-icon { background: rgba(255,255,255,.18); }
+    .role-icon-img { width: 30px; height: 30px; object-fit: contain; display: block; }
     .role-label { font-weight: 600; font-size: 1.05rem; }
     .role-desc { font-size: .82rem; opacity: .75; margin-top: 2px; }
 
@@ -271,7 +272,7 @@
 
       <button class="role-btn role-btn-admin" id="safetyBtn">
         <span class="left">
-          <span class="role-icon">🛡️</span>
+          <span class="role-icon"><img src="safety-officer.png" class="role-icon-img" alt="Safety Officer"></span>
           <span>
             <span class="role-label">Safety Officer Login</span>
             <span class="role-desc d-block">เพิ่ม แก้ไข และกำหนดตำแหน่ง</span>
@@ -759,8 +760,7 @@
       els.detailSummary.append(
         makeSummaryRow('Part No.', item.partNo || '-'),
         makeSummaryRow('สถานะ SDS', item.url ? '✅ พร้อมใช้งาน' : '⚠️ ยังไม่มีไฟล์'),
-        makeSummaryRow('ตำแหน่งจัดเก็บ', hasPosition(item) ? '📍 ระบุแล้ว' : 'ยังไม่ได้ระบุ'),
-        makeSummaryRow('โหมดการใช้งาน', currentRole === 'admin' ? 'Safety Officer' : 'พนักงานทั่วไป')
+        makeSummaryRow('ตำแหน่งจัดเก็บ', hasPosition(item) ? '📍 ระบุแล้ว' : 'ยังไม่ได้ระบุ')
       );
 
       if (item.url) {
