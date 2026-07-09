@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SDS Database System - Secure V2</title>
+  <title>SDS Database System - Secure V3 Position</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -49,6 +49,14 @@
     iframe { width: 100%; height: 100%; border: none; background-color: #525659; }
     #loader { display: none; text-align: center; margin: 40px 0; }
     .admin-section { display: none; margin-top: 30px; }
+
+    .layout-wrapper { position: relative; width: 100%; background: #edf2f7; border-radius: 14px; overflow: hidden; border: 1px solid #e2e8f0; touch-action: none; }
+    .layout-wrapper img { width: 100%; display: block; border-radius: 14px; user-select: none; -webkit-user-drag: none; }
+    .position-marker { position: absolute; width: 26px; height: 26px; border-radius: 50%; background: #dc3545; border: 3px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.45); transform: translate(-50%, -50%); left: 50%; top: 50%; z-index: 3; }
+    .position-marker.marker-editable { cursor: grab; }
+    .position-marker.marker-editable:active { cursor: grabbing; transform: translate(-50%, -50%) scale(1.08); }
+    .position-marker::after { content: ''; position: absolute; width: 42px; height: 42px; border: 2px solid rgba(220,53,69,0.45); border-radius: 50%; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+    .position-hint { font-size: 0.85rem; color: #718096; margin-top: 10px; text-align: center; }
     .small-note { font-size: 0.8rem; color: #718096; }
   </style>
 </head>
@@ -157,6 +165,27 @@
     </div>
   </div>
 
+
+  <div class="modal fade" id="positionModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content" style="border-radius: 20px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+        <div class="modal-header bg-light" style="border-radius: 20px 20px 0 0; border-bottom: none;">
+          <h5 class="modal-title" id="positionModalTitle" style="font-weight: 600; color: var(--primary);">📍 ตำแหน่งจัดเก็บสารเคมี</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-3 p-md-4">
+          <div id="positionStatus" class="alert alert-info text-center rounded-3 mb-3">กำลังโหลด Layout...</div>
+          <div id="layoutWrapper" class="layout-wrapper">
+            <img id="layoutImage" alt="Chemical storage layout">
+            <div id="positionMarker" class="position-marker"></div>
+          </div>
+          <div id="positionHint" class="position-hint">ลากจุดสีแดงไปยังตำแหน่งจัดเก็บ แล้วกดบันทึก</div>
+          <button type="button" class="btn btn-danger w-100 mt-3" id="savePositionBtn" style="border-radius:12px; padding:12px; font-weight:500;">บันทึกตำแหน่ง</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="modal modal-pdf fade" id="pdfModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h6 class="modal-title m-0" id="pdfModalTitle">Document Viewer</h6><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" id="closePdfBtn"></button></div><div class="modal-body"><iframe id="pdfFrame" src=""></iframe></div></div></div>
   </div>
@@ -176,6 +205,11 @@
     let globalChemicalData = [];
     let chemicalById = new Map();
     let currentRole = 'guest';
+    let layoutImageUrl = '';
+    let activePositionItemId = '';
+    let activePositionEditable = false;
+    let activePosition = { x: 50, y: 50 };
+    let isDraggingMarker = false;
 
     const els = {};
 
@@ -191,6 +225,7 @@
         'pinInput', 'loginError', 'loginBtn', 'uploadForm', 'editForm',
         'submitBtn', 'updateBtn', 'statusMessage', 'editStatusMessage',
         'detailName', 'detailBrand', 'detailType', 'detailActions',
+        'positionModalTitle', 'positionStatus', 'layoutWrapper', 'layoutImage', 'positionMarker', 'positionHint', 'savePositionBtn',
         'pdfModalTitle', 'pdfFrame'
       ].forEach(id => els[id] = document.getElementById(id));
     }
@@ -209,6 +244,12 @@
       els.typeFilter.addEventListener('change', filterData);
       els.uploadForm.addEventListener('submit', handleUpload);
       els.editForm.addEventListener('submit', handleUpdate);
+      els.savePositionBtn.addEventListener('click', savePosition);
+      els.layoutWrapper.addEventListener('click', handleLayoutClick);
+      els.positionMarker.addEventListener('pointerdown', startMarkerDrag);
+      els.positionMarker.addEventListener('pointermove', moveMarkerDrag);
+      els.positionMarker.addEventListener('pointerup', stopMarkerDrag);
+      els.positionMarker.addEventListener('pointercancel', stopMarkerDrag);
     }
 
     function getAuthToken() {
@@ -248,13 +289,21 @@
     }
 
     function normalizeItem(item) {
+      const x = Number(item.positionX);
+      const y = Number(item.positionY);
       return {
         id: String(item.id || ''),
         name: String(item.name || '-'),
         brand: String(item.brand || '-'),
         type: String(item.type || '-'),
-        url: String(item.url || '').trim()
+        url: String(item.url || '').trim(),
+        positionX: Number.isFinite(x) ? x : null,
+        positionY: Number.isFinite(y) ? y : null
       };
+    }
+
+    function hasPosition(item) {
+      return item && Number.isFinite(item.positionX) && Number.isFinite(item.positionY);
     }
 
     function enterApp(role) {
@@ -446,7 +495,25 @@
         els.detailActions.appendChild(disabledBtn);
       }
 
+      const positionBtn = makeButton(hasPosition(item) ? '📍 ดูตำแหน่งจัดเก็บ' : '📍 ยังไม่ได้กำหนดตำแหน่ง', 'btn btn-outline-danger w-100 mb-2');
+      positionBtn.style.borderRadius = '12px';
+      positionBtn.style.padding = '12px';
+      positionBtn.style.fontWeight = '500';
+      if (hasPosition(item)) {
+        positionBtn.addEventListener('click', () => openPositionModal(item.id, false));
+      } else {
+        positionBtn.disabled = true;
+      }
+      els.detailActions.appendChild(positionBtn);
+
       if (currentRole === 'admin') {
+        const adminPositionBtn = makeButton(hasPosition(item) ? '📍 แก้ไขตำแหน่ง' : '📍 กำหนดตำแหน่ง', 'btn btn-danger w-100 mb-2');
+        adminPositionBtn.style.borderRadius = '12px';
+        adminPositionBtn.style.padding = '12px';
+        adminPositionBtn.style.fontWeight = '500';
+        adminPositionBtn.addEventListener('click', () => openPositionModal(item.id, true));
+        els.detailActions.appendChild(adminPositionBtn);
+
         const row = document.createElement('div');
         row.className = 'd-flex gap-2';
 
@@ -602,6 +669,142 @@
         alert('ลบข้อมูลไม่สำเร็จ: ' + error.message);
       } finally {
         els.loader.style.display = 'none';
+      }
+    }
+
+    async function loadLayoutImageUrl() {
+      if (layoutImageUrl) return layoutImageUrl;
+      const result = await apiRequest('getLayout');
+      if (!result.url || !isSafeUrl(result.url)) throw new Error('URL Layout ไม่ถูกต้อง');
+      layoutImageUrl = result.url;
+      return layoutImageUrl;
+    }
+
+    function setLayoutImage(url) {
+      return new Promise((resolve, reject) => {
+        const img = els.layoutImage;
+        if (img.src === url && img.complete && img.naturalWidth > 0) return resolve();
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error('โหลดรูป Layout ไม่สำเร็จ กรุณาตรวจว่าไฟล์เป็น PNG/JPG และแชร์ได้'));
+        img.src = url;
+      });
+    }
+
+    async function openPositionModal(id, editable) {
+      const item = chemicalById.get(id);
+      if (!item) return;
+
+      const detailModal = bootstrap.Modal.getInstance(document.getElementById('detailModal'));
+      if (detailModal) detailModal.hide();
+
+      activePositionItemId = id;
+      activePositionEditable = editable;
+      isDraggingMarker = false;
+
+      els.positionModalTitle.textContent = (editable ? '📍 กำหนดตำแหน่ง: ' : '📍 ตำแหน่งจัดเก็บ: ') + item.name;
+      els.positionStatus.className = 'alert alert-info text-center rounded-3 mb-3';
+      els.positionStatus.textContent = 'กำลังโหลด Layout...';
+      els.savePositionBtn.style.display = editable ? 'block' : 'none';
+      els.positionMarker.classList.toggle('marker-editable', editable);
+      els.positionHint.textContent = editable
+        ? 'แตะหรือคลิกบน Layout / ลากจุดสีแดง แล้วกดบันทึก'
+        : 'ตำแหน่งจัดเก็บของสารเคมีนี้';
+
+      const x = hasPosition(item) ? item.positionX : 50;
+      const y = hasPosition(item) ? item.positionY : 50;
+      setMarkerPosition(x, y);
+
+      setTimeout(() => new bootstrap.Modal(document.getElementById('positionModal')).show(), 300);
+
+      try {
+        const url = await loadLayoutImageUrl();
+        await setLayoutImage(url);
+        els.positionStatus.className = 'alert alert-success text-center rounded-3 mb-3';
+        els.positionStatus.textContent = editable ? 'โหลด Layout สำเร็จ — วางจุดสีแดงได้เลย' : 'โหลด Layout สำเร็จ';
+        setMarkerPosition(x, y);
+      } catch (error) {
+        els.positionStatus.className = 'alert alert-danger text-center rounded-3 mb-3';
+        els.positionStatus.textContent = '❌ ' + error.message;
+      }
+    }
+
+    function setMarkerPosition(x, y) {
+      const safeX = clamp(Number(x), 0, 100);
+      const safeY = clamp(Number(y), 0, 100);
+      activePosition = { x: safeX, y: safeY };
+      els.positionMarker.style.left = safeX + '%';
+      els.positionMarker.style.top = safeY + '%';
+      if (activePositionEditable) {
+        els.positionHint.textContent = `ตำแหน่งปัจจุบัน: X ${safeX.toFixed(2)}%, Y ${safeY.toFixed(2)}%`;
+      }
+    }
+
+    function clamp(value, min, max) {
+      if (!Number.isFinite(value)) return min;
+      return Math.min(max, Math.max(min, value));
+    }
+
+    function setMarkerFromClientPoint(clientX, clientY) {
+      const rect = els.layoutWrapper.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) return;
+      const x = ((clientX - rect.left) / rect.width) * 100;
+      const y = ((clientY - rect.top) / rect.height) * 100;
+      setMarkerPosition(x, y);
+    }
+
+    function handleLayoutClick(event) {
+      if (!activePositionEditable) return;
+      // ถ้าคลิกที่จุดแดงเอง pointer event ของ drag จะจัดการแล้ว
+      if (event.target === els.positionMarker) return;
+      setMarkerFromClientPoint(event.clientX, event.clientY);
+    }
+
+    function startMarkerDrag(event) {
+      if (!activePositionEditable) return;
+      isDraggingMarker = true;
+      els.positionMarker.setPointerCapture(event.pointerId);
+      event.preventDefault();
+    }
+
+    function moveMarkerDrag(event) {
+      if (!activePositionEditable || !isDraggingMarker) return;
+      setMarkerFromClientPoint(event.clientX, event.clientY);
+      event.preventDefault();
+    }
+
+    function stopMarkerDrag(event) {
+      if (!isDraggingMarker) return;
+      isDraggingMarker = false;
+      try { els.positionMarker.releasePointerCapture(event.pointerId); } catch (_) {}
+    }
+
+    async function savePosition() {
+      if (!activePositionEditable || !activePositionItemId) return;
+
+      els.savePositionBtn.disabled = true;
+      els.savePositionBtn.textContent = 'กำลังบันทึกตำแหน่ง...';
+      try {
+        await apiRequest('updatePosition', {
+          id: activePositionItemId,
+          positionX: activePosition.x.toFixed(2),
+          positionY: activePosition.y.toFixed(2)
+        }, true);
+
+        const item = chemicalById.get(activePositionItemId);
+        if (item) {
+          item.positionX = activePosition.x;
+          item.positionY = activePosition.y;
+        }
+
+        els.positionStatus.className = 'alert alert-success text-center rounded-3 mb-3';
+        els.positionStatus.textContent = '✅ บันทึกตำแหน่งสำเร็จ';
+        await loadData();
+      } catch (error) {
+        els.positionStatus.className = 'alert alert-danger text-center rounded-3 mb-3';
+        els.positionStatus.textContent = '❌ บันทึกไม่สำเร็จ: ' + error.message;
+      } finally {
+        els.savePositionBtn.disabled = false;
+        els.savePositionBtn.textContent = 'บันทึกตำแหน่ง';
       }
     }
 
