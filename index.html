@@ -205,7 +205,7 @@
     let globalChemicalData = [];
     let chemicalById = new Map();
     let currentRole = 'guest';
-    let layoutImageSrc = '';
+    let layoutImageSources = [];
     let activePositionItemId = '';
     let activePositionEditable = false;
     let activePosition = { x: 50, y: 50 };
@@ -672,22 +672,43 @@
       }
     }
 
-    async function loadLayoutImageSrc() {
-      if (layoutImageSrc) return layoutImageSrc;
+    async function loadLayoutImageSources() {
+      if (layoutImageSources.length > 0) return layoutImageSources;
       const result = await apiRequest('getLayout');
-      const src = result.dataUrl || result.url || '';
-      if (!isSafeImageSrc(src)) throw new Error('URL Layout ไม่ถูกต้อง');
-      layoutImageSrc = src;
-      return layoutImageSrc;
+      const candidates = [result.dataUrl, result.thumbnailUrl, result.lhUrl, result.url].filter(Boolean);
+      layoutImageSources = candidates.filter(isSafeImageSrc);
+      if (layoutImageSources.length === 0) {
+        throw new Error('ไม่พบแหล่งรูป Layout ที่ใช้ได้จาก Server');
+      }
+      return layoutImageSources;
     }
 
-    function setLayoutImage(url) {
+    function setLayoutImageFromSources(sources) {
       return new Promise((resolve, reject) => {
         const img = els.layoutImage;
-        if (img.src === url && img.complete && img.naturalWidth > 0) return resolve();
-        img.onload = () => resolve();
-        img.onerror = () => reject(new Error('โหลดรูป Layout ไม่สำเร็จ กรุณาตรวจว่าไฟล์เป็น PNG/JPG และขนาดไม่ใหญ่เกินไป'));
-        img.src = url;
+        let index = 0;
+
+        const tryNext = () => {
+          if (index >= sources.length) {
+            reject(new Error('โหลดรูป Layout ไม่สำเร็จ — ลองแปลงไฟล์เป็น JPG/PNG และใช้ LAYOUT_FILE_ID โดยตรง'));
+            return;
+          }
+
+          const url = sources[index++];
+          if (img.src === url && img.complete && img.naturalWidth > 0) {
+            resolve();
+            return;
+          }
+
+          img.onload = () => {
+            if (img.naturalWidth > 0) resolve();
+            else tryNext();
+          };
+          img.onerror = () => tryNext();
+          img.src = url;
+        };
+
+        tryNext();
       });
     }
 
@@ -718,8 +739,8 @@
       setTimeout(() => new bootstrap.Modal(document.getElementById('positionModal')).show(), 300);
 
       try {
-        const src = await loadLayoutImageSrc();
-        await setLayoutImage(src);
+        const sources = await loadLayoutImageSources();
+        await setLayoutImageFromSources(sources);
         els.positionStatus.className = 'alert alert-success text-center rounded-3 mb-3';
         els.positionStatus.textContent = editable ? 'โหลด Layout สำเร็จ — วางจุดสีแดงได้เลย' : 'โหลด Layout สำเร็จ';
         setMarkerPosition(x, y);
