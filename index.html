@@ -3,24 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SDS Database System</title>
+  <title>SDS Database System - Secure V2</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  
+
   <style>
     :root { --primary: #0A2540; --accent: #FF9F1C; --bg-color: #F4F7F6; --text-main: #2D3748; }
     body { background-color: var(--bg-color); font-family: 'Kanit', sans-serif; color: var(--text-main); }
-    
+
     #landingPage { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; background: linear-gradient(135deg, #0A2540, #113a63); color: white; }
     .role-btn { width: 100%; max-width: 350px; padding: 20px; border-radius: 20px; margin-bottom: 20px; font-size: 1.2rem; font-weight: 500; border: none; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 15px; }
+    .role-btn:active { transform: scale(0.98); }
     .btn-employee { background-color: white; color: var(--primary); }
     .btn-safety { background-color: var(--accent); color: white; }
 
     #mainApp { display: none; }
     .app-header { background: linear-gradient(135deg, var(--primary), #113a63); padding: 30px 20px 70px; text-align: center; color: white; border-radius: 0 0 30px 30px; position: relative; }
     .btn-back { position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 15px; border-radius: 12px; font-size: 0.9rem; }
-    
+
     .dashboard-container { max-width: 600px; margin: -40px auto 20px; padding: 0 15px; position: relative; z-index: 10; display: flex; gap: 15px; }
     .dash-card { background: white; flex: 1; border-radius: 16px; padding: 15px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-bottom: 4px solid var(--accent); display: flex; flex-direction: column; justify-content: center; }
     .dash-title { font-size: 0.85rem; color: #718096; font-weight: 500; margin-bottom: 5px; }
@@ -30,33 +31,17 @@
     .filter-container { max-width: 600px; margin: 0 auto 20px; padding: 0 15px; display: flex; flex-direction: column; gap: 10px; }
     .search-box { border-radius: 30px; padding: 15px 25px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.04); font-size: 1.05rem; }
     .filter-group { display: flex; gap: 10px; }
-    .filter-select { border-radius: 15px; border: 1px solid #e2e8f0; padding: 10px 15px; flex: 1; font-size: 0.95rem; color: #4a5568; outline: none; }
-    
+    .filter-select { border-radius: 15px; border: 1px solid #e2e8f0; padding: 10px 15px; flex: 1; font-size: 0.95rem; color: #4a5568; outline: none; background-color: #fff; }
+
     .content-container { max-width: 600px; margin: auto; padding: 0 15px 50px; }
-    
-    /* --- ปรับแต่งการ์ดรายชื่อใหม่ ให้ดูคลีนและกดได้ --- */
-    .card-chem { 
-      background: white; 
-      border-radius: 16px; 
-      margin-bottom: 12px; 
-      padding: 18px 20px; 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04); 
-      border-left: 6px solid var(--primary); 
-      cursor: pointer;
-      transition: 0.2s;
-    }
+    .card-chem { background: white; border-radius: 16px; margin-bottom: 12px; padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-left: 6px solid var(--primary); cursor: pointer; transition: 0.2s; }
     .card-chem:active { transform: scale(0.98); background-color: #f8f9fa; }
-    .chem-name { font-weight: 500; font-size: 1.15rem; color: var(--primary); margin: 0; line-height: 1.2;}
-    .chem-icon { color: #cbd5e0; font-size: 1.2rem; font-weight: bold;}
-    
-    /* ป้าย Tag สำหรับหน้า Detail */
+    .chem-name { font-weight: 500; font-size: 1.15rem; color: var(--primary); margin: 0; line-height: 1.2; }
+    .chem-icon { color: #cbd5e0; font-size: 1.2rem; font-weight: bold; }
+
     .badge-brand { background-color: #e2e8f0; color: #4a5568; font-weight: 500; padding: 6px 12px; border-radius: 8px; font-size: 0.9rem; display: inline-block; }
     .badge-type { background-color: #e6f6ff; color: #0284c7; font-weight: 500; padding: 6px 12px; border-radius: 8px; font-size: 0.9rem; display: inline-block; }
-    
-    /* UI ยิบย่อย */
+
     .modal-pdf .modal-dialog { width: 100%; height: 100%; margin: 0; padding: 0; max-width: none; }
     .modal-pdf .modal-content { height: 100%; border-radius: 0; background-color: #333; }
     .modal-pdf .modal-header { background-color: #111; color: white; padding: 15px; }
@@ -64,6 +49,7 @@
     iframe { width: 100%; height: 100%; border: none; background-color: #525659; }
     #loader { display: none; text-align: center; margin: 40px 0; }
     .admin-section { display: none; margin-top: 30px; }
+    .small-note { font-size: 0.8rem; color: #718096; }
   </style>
 </head>
 <body>
@@ -73,13 +59,13 @@
       <h1 style="font-weight: 600; letter-spacing: 1px;">SDS VIEWER</h1>
       <p style="opacity: 0.8; font-size: 1.1rem;">ระบบจัดการเอกสารความปลอดภัย</p>
     </div>
-    <button class="role-btn btn-employee" onclick="enterApp('employee')"><span style="font-size: 1.5rem;">👷‍♂️</span> พนักงานทั่วไป (ดูข้อมูล)</button>
-    <button class="role-btn btn-safety" onclick="promptLogin()"><span style="font-size: 1.5rem;">🛡️</span> Safety Officer (จัดการระบบ)</button>
+    <button class="role-btn btn-employee" id="employeeBtn"><span style="font-size: 1.5rem;">👷‍♂️</span> พนักงานทั่วไป (ดูข้อมูล)</button>
+    <button class="role-btn btn-safety" id="safetyBtn"><span style="font-size: 1.5rem;">🛡️</span> Safety Officer (จัดการระบบ)</button>
   </div>
 
   <div id="mainApp">
     <div class="app-header">
-      <button class="btn-back" onclick="logout()">← กลับ</button>
+      <button class="btn-back" id="logoutBtn">← กลับ</button>
       <h3 style="font-weight: 600; margin-bottom: 5px; margin-top: 10px;">SDS Database</h3>
       <div id="roleIndicator" style="font-size: 0.85rem; opacity: 0.9;">โหมดพนักงาน</div>
     </div>
@@ -96,21 +82,21 @@
     </div>
 
     <div class="filter-container">
-      <input type="text" id="searchInput" class="form-control search-box" placeholder="🔍 ค้นหาชื่อสารเคมี..." oninput="filterData()">
+      <input type="text" id="searchInput" class="form-control search-box" placeholder="🔍 ค้นหาชื่อสารเคมี...">
       <div class="filter-group">
-        <select id="brandFilter" class="filter-select" onchange="filterData()"><option value="">🏷️ ทุกยี่ห้อ (Brand)</option></select>
-        <select id="typeFilter" class="filter-select" onchange="filterData()"><option value="">🛢️ ทุกประเภท</option></select>
+        <select id="brandFilter" class="filter-select"><option value="">🏷️ ทุกยี่ห้อ (Brand)</option></select>
+        <select id="typeFilter" class="filter-select"><option value="">🛢️ ทุกประเภท</option></select>
       </div>
     </div>
 
     <div class="content-container">
       <div id="loader"><div class="spinner-border text-primary" role="status"></div><div class="mt-2 text-muted">กำลังดึงข้อมูล...</div></div>
-      
       <div id="chemicalList"></div>
 
       <div class="admin-section card p-4 mt-4" id="adminPanel" style="border-radius: 16px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-        <h5 style="font-weight: 600; color: var(--primary); margin-bottom: 20px;">➕ อัปโหลดสารเคมีใหม่</h5>
-        <form id="uploadForm" onsubmit="handleUpload(event)">
+        <h5 style="font-weight: 600; color: var(--primary); margin-bottom: 8px;">➕ อัปโหลดสารเคมีใหม่</h5>
+        <div class="small-note mb-3">รองรับเฉพาะ PDF ไม่เกิน 5 MB</div>
+        <form id="uploadForm">
           <div class="mb-3"><label class="form-label small text-muted mb-1">ชื่อสารเคมี</label><input type="text" id="chemName" class="form-control" style="border-radius: 10px;" required></div>
           <div class="row mb-3">
             <div class="col-6"><label class="form-label small text-muted mb-1">ยี่ห้อ (Brand)</label><input type="text" id="chemBrand" class="form-control" style="border-radius: 10px;" required></div>
@@ -137,7 +123,6 @@
             <span class="badge-brand" id="detailBrand">🏢 Brand</span>
             <span class="badge-type" id="detailType">⚙️ Type</span>
           </div>
-          
           <div id="detailActions" class="d-flex flex-column gap-2"></div>
         </div>
       </div>
@@ -152,7 +137,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body p-4">
-          <form id="editForm" onsubmit="handleUpdate(event)">
+          <form id="editForm">
             <input type="hidden" id="editId">
             <div class="mb-3"><label class="form-label small text-muted mb-1">ชื่อสารเคมี</label><input type="text" id="editName" class="form-control" style="border-radius: 10px;" required></div>
             <div class="row mb-3">
@@ -173,299 +158,478 @@
   </div>
 
   <div class="modal modal-pdf fade" id="pdfModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h6 class="modal-title m-0" id="pdfModalTitle">Document Viewer</h6><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" onclick="closePdf()"></button></div><div class="modal-body"><iframe id="pdfFrame" src=""></iframe></div></div></div>
+    <div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h6 class="modal-title m-0" id="pdfModalTitle">Document Viewer</h6><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" id="closePdfBtn"></button></div><div class="modal-body"><iframe id="pdfFrame" src=""></iframe></div></div></div>
   </div>
 
   <div class="modal fade" id="loginModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered"><div class="modal-content" style="border-radius: 20px; border: none;"><div class="modal-body p-4 text-center"><h5 class="mb-3" style="font-weight: 600;">🔒 รหัสผ่านเจ้าหน้าที่</h5><input type="password" id="pinInput" class="form-control text-center mb-3" placeholder="PIN Code" style="border-radius: 15px; padding: 15px; font-size: 1.2rem;"><button class="btn btn-primary w-100" onclick="verifyLogin()" style="border-radius: 15px; padding: 12px; font-weight: 500;">เข้าสู่ระบบ</button><div id="loginError" class="text-danger mt-2 small d-none">รหัสผ่านไม่ถูกต้อง</div></div></div></div>
+    <div class="modal-dialog modal-dialog-centered"><div class="modal-content" style="border-radius: 20px; border: none;"><div class="modal-body p-4 text-center"><h5 class="mb-3" style="font-weight: 600;">🔒 รหัสผ่านเจ้าหน้าที่</h5><input type="password" id="pinInput" class="form-control text-center mb-3" placeholder="PIN Code" style="border-radius: 15px; padding: 15px; font-size: 1.2rem;"><button class="btn btn-primary w-100" id="loginBtn" style="border-radius: 15px; padding: 12px; font-weight: 500;">เข้าสู่ระบบ</button><div id="loginError" class="text-danger mt-2 small d-none">รหัสผ่านไม่ถูกต้อง</div></div></div></div>
   </div>
 
   <script>
     // ********************************************************************************
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxbCcOMOoaq2fQC82dOFw8zPOTtIBp8PSkLIBlMRMaCR3xIQBLpN2C6oYkidNeBvBzfRg/exec"; 
-    const ADMIN_PIN = "LCB1"; 
+    // ใส่ URL Web App ของ Google Apps Script ตัวใหม่ที่รองรับ action: list/login/upload/update/delete
+    // หมายเหตุ: เวอร์ชันนี้ไม่มี ADMIN_PIN ในหน้าเว็บแล้ว ต้องตรวจรหัสฝั่ง Apps Script เท่านั้น
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxbCcOMOoaq2fQC82dOFw8zPOTtIBp8PSkLIBlMRMaCR3xIQBLpN2C6oYkidNeBvBzfRg/exec";
+    const MAX_FILE_SIZE_MB = 5;
     // ********************************************************************************
 
     let globalChemicalData = [];
+    let chemicalById = new Map();
     let currentRole = 'guest';
+
+    const els = {};
+
+    document.addEventListener('DOMContentLoaded', () => {
+      cacheElements();
+      bindEvents();
+    });
+
+    function cacheElements() {
+      [
+        'landingPage', 'mainApp', 'adminPanel', 'roleIndicator', 'chemicalList', 'loader',
+        'searchInput', 'brandFilter', 'typeFilter', 'dashTotal', 'dashReady',
+        'pinInput', 'loginError', 'loginBtn', 'uploadForm', 'editForm',
+        'submitBtn', 'updateBtn', 'statusMessage', 'editStatusMessage',
+        'detailName', 'detailBrand', 'detailType', 'detailActions',
+        'pdfModalTitle', 'pdfFrame'
+      ].forEach(id => els[id] = document.getElementById(id));
+    }
+
+    function bindEvents() {
+      document.getElementById('employeeBtn').addEventListener('click', () => enterApp('employee'));
+      document.getElementById('safetyBtn').addEventListener('click', promptLogin);
+      document.getElementById('logoutBtn').addEventListener('click', logout);
+      document.getElementById('closePdfBtn').addEventListener('click', closePdf);
+      els.loginBtn.addEventListener('click', verifyLogin);
+      els.pinInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') verifyLogin();
+      });
+      els.searchInput.addEventListener('input', filterData);
+      els.brandFilter.addEventListener('change', filterData);
+      els.typeFilter.addEventListener('change', filterData);
+      els.uploadForm.addEventListener('submit', handleUpload);
+      els.editForm.addEventListener('submit', handleUpdate);
+    }
+
+    function getAuthToken() {
+      return sessionStorage.getItem('sdsAuthToken') || '';
+    }
+
+    function setAuthToken(token) {
+      sessionStorage.setItem('sdsAuthToken', token);
+    }
+
+    function clearAuthToken() {
+      sessionStorage.removeItem('sdsAuthToken');
+    }
+
+    async function apiRequest(action, payload = {}, requireAuth = false) {
+      const requestBody = { action, ...payload };
+      if (requireAuth) requestBody.authToken = getAuthToken();
+
+      const response = await fetch(GAS_API_URL, {
+        method: 'POST',
+        body: JSON.stringify(requestBody),
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+      });
+
+      if (!response.ok) throw new Error('เชื่อมต่อ Server ไม่สำเร็จ');
+      const result = await response.json();
+
+      if (!result.success) {
+        if (result.errorCode === 'UNAUTHORIZED') {
+          clearAuthToken();
+          currentRole = 'employee';
+          throw new Error('Session หมดอายุหรือไม่มีสิทธิ์ กรุณา Login ใหม่');
+        }
+        throw new Error(result.message || 'ดำเนินการไม่สำเร็จ');
+      }
+      return result;
+    }
+
+    function normalizeItem(item) {
+      return {
+        id: String(item.id || ''),
+        name: String(item.name || '-'),
+        brand: String(item.brand || '-'),
+        type: String(item.type || '-'),
+        url: String(item.url || '').trim()
+      };
+    }
 
     function enterApp(role) {
       currentRole = role;
-      document.getElementById('landingPage').style.display = 'none';
-      document.getElementById('mainApp').style.display = 'block';
-      const adminPanel = document.getElementById('adminPanel');
-      const roleIndicator = document.getElementById('roleIndicator');
-      
+      els.landingPage.style.display = 'none';
+      els.mainApp.style.display = 'block';
+
       if (role === 'admin') {
-        adminPanel.style.display = 'block';
-        roleIndicator.innerHTML = '<span class="badge bg-warning text-dark">โหมดจัดการระบบ (Safety Officer)</span>';
+        els.adminPanel.style.display = 'block';
+        els.roleIndicator.innerHTML = '<span class="badge bg-warning text-dark">โหมดจัดการระบบ (Safety Officer)</span>';
       } else {
-        adminPanel.style.display = 'none';
-        roleIndicator.innerText = 'โหมดดูข้อมูลเท่านั้น';
+        els.adminPanel.style.display = 'none';
+        els.roleIndicator.textContent = 'โหมดดูข้อมูลเท่านั้น';
       }
       loadData();
     }
 
     function logout() {
-      document.getElementById('mainApp').style.display = 'none';
-      document.getElementById('landingPage').style.display = 'flex';
+      els.mainApp.style.display = 'none';
+      els.landingPage.style.display = 'flex';
       currentRole = 'guest';
-      document.getElementById('chemicalList').innerHTML = ''; 
-      document.getElementById('searchInput').value = '';
+      clearAuthToken();
+      globalChemicalData = [];
+      chemicalById.clear();
+      els.chemicalList.textContent = '';
+      els.searchInput.value = '';
+      els.brandFilter.value = '';
+      els.typeFilter.value = '';
     }
 
     function promptLogin() {
-      document.getElementById('pinInput').value = '';
-      document.getElementById('loginError').classList.add('d-none');
+      els.pinInput.value = '';
+      els.loginError.classList.add('d-none');
       new bootstrap.Modal(document.getElementById('loginModal')).show();
     }
 
-    function verifyLogin() {
-      if (document.getElementById('pinInput').value === ADMIN_PIN) {
+    async function verifyLogin() {
+      const pin = els.pinInput.value.trim();
+      if (!pin) return;
+
+      els.loginBtn.disabled = true;
+      els.loginBtn.textContent = 'กำลังตรวจสอบ...';
+      els.loginError.classList.add('d-none');
+
+      try {
+        const result = await apiRequest('login', { pin });
+        setAuthToken(result.token);
         bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
         enterApp('admin');
-      } else {
-        document.getElementById('loginError').classList.remove('d-none');
+      } catch (error) {
+        els.loginError.textContent = error.message || 'รหัสผ่านไม่ถูกต้อง';
+        els.loginError.classList.remove('d-none');
+      } finally {
+        els.loginBtn.disabled = false;
+        els.loginBtn.textContent = 'เข้าสู่ระบบ';
+      }
+    }
+
+    async function loadData() {
+      els.loader.style.display = 'block';
+      els.chemicalList.textContent = '';
+      try {
+        const result = await apiRequest('list');
+        globalChemicalData = (result.data || [])
+          .map(normalizeItem)
+          .sort((a, b) => a.name.localeCompare(b.name, 'th'));
+        chemicalById = new Map(globalChemicalData.map(item => [item.id, item]));
+        populateFilters(globalChemicalData);
+        displayData(globalChemicalData);
+        updateDashboard(globalChemicalData);
+      } catch (error) {
+        showEmptyMessage('เชื่อมต่อฐานข้อมูลล้มเหลว: ' + error.message);
+      } finally {
+        els.loader.style.display = 'none';
       }
     }
 
     function updateDashboard(data) {
-      document.getElementById('dashTotal').innerText = data.length;
-      const readyCount = data.filter(item => item.url && item.url.trim() !== '').length;
-      const readyElement = document.getElementById('dashReady');
-      readyElement.innerText = readyCount;
-      if (readyCount < data.length) readyElement.classList.add('warning');
-      else readyElement.classList.remove('warning');
+      els.dashTotal.textContent = data.length;
+      const readyCount = data.filter(item => item.url !== '').length;
+      els.dashReady.textContent = readyCount;
+      els.dashReady.classList.toggle('warning', readyCount < data.length);
     }
 
     function populateFilters(data) {
-      const brandSet = new Set(), typeSet = new Set();
+      const brandSet = new Set();
+      const typeSet = new Set();
       data.forEach(item => {
-        if(item.brand && item.brand !== '-') brandSet.add(item.brand);
-        if(item.type && item.type !== '-') typeSet.add(item.type);
+        if (item.brand && item.brand !== '-') brandSet.add(item.brand);
+        if (item.type && item.type !== '-') typeSet.add(item.type);
       });
-      const brandSelect = document.getElementById('brandFilter'), typeSelect = document.getElementById('typeFilter');
-      brandSelect.innerHTML = '<option value="">🏷️ ทุกยี่ห้อ (Brand)</option>';
-      typeSelect.innerHTML = '<option value="">🛢️ ทุกประเภท</option>';
-      [...brandSet].sort().forEach(b => brandSelect.innerHTML += `<option value="${b}">${b}</option>`);
-      [...typeSet].sort().forEach(t => typeSelect.innerHTML += `<option value="${t}">${t}</option>`);
+
+      resetSelect(els.brandFilter, '🏷️ ทุกยี่ห้อ (Brand)');
+      resetSelect(els.typeFilter, '🛢️ ทุกประเภท');
+
+      [...brandSet].sort((a, b) => a.localeCompare(b, 'th')).forEach(brand => appendOption(els.brandFilter, brand));
+      [...typeSet].sort((a, b) => a.localeCompare(b, 'th')).forEach(type => appendOption(els.typeFilter, type));
     }
 
-    async function loadData() {
-      document.getElementById('loader').style.display = 'block';
-      document.getElementById('chemicalList').innerHTML = '';
-      try {
-        const response = await fetch(GAS_API_URL);
-        const result = await response.json();
-        if (result.success) {
-          globalChemicalData = result.data.sort((a, b) => a.name.localeCompare(b.name));
-          populateFilters(globalChemicalData);
-          displayData(globalChemicalData);
-          updateDashboard(globalChemicalData);
-        }
-      } catch (error) { alert('เชื่อมต่อฐานข้อมูลล้มเหลว'); } 
-      finally { document.getElementById('loader').style.display = 'none'; }
+    function resetSelect(select, label) {
+      select.textContent = '';
+      const option = document.createElement('option');
+      option.value = '';
+      option.textContent = label;
+      select.appendChild(option);
+    }
+
+    function appendOption(select, value) {
+      const option = document.createElement('option');
+      option.value = value;
+      option.textContent = value;
+      select.appendChild(option);
     }
 
     function displayData(data) {
-      const listDiv = document.getElementById('chemicalList');
-      listDiv.innerHTML = ''; 
-      if(data.length === 0) return listDiv.innerHTML = `<div class="text-center text-muted my-4 p-4 bg-white" style="border-radius:15px;">ไม่พบข้อมูล</div>`;
+      els.chemicalList.textContent = '';
+      if (data.length === 0) return showEmptyMessage('ไม่พบข้อมูล');
 
+      const fragment = document.createDocumentFragment();
       data.forEach(item => {
-        // Escape quotes เพื่อป้องกัน Error
-        const safeName = item.name.replace(/'/g, "\\'");
-        const safeBrand = item.brand.replace(/'/g, "\\'");
-        const safeType = item.type.replace(/'/g, "\\'");
-        const safeUrl = item.url ? item.url : '';
+        const card = document.createElement('div');
+        card.className = 'card-chem';
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
 
-        // การ์ดแบบคลีน มีแค่ชื่อสารเคมี เมื่อกดจะเรียก openDetailModal
-        const card = `
-          <div class="card-chem" onclick="openDetailModal('${item.id}', '${safeName}', '${safeBrand}', '${safeType}', '${safeUrl}')">
-            <h3 class="chem-name">${item.name}</h3>
-            <span class="chem-icon">›</span>
-          </div>`;
-        listDiv.innerHTML += card;
+        const title = document.createElement('h3');
+        title.className = 'chem-name';
+        title.textContent = item.name;
+
+        const icon = document.createElement('span');
+        icon.className = 'chem-icon';
+        icon.textContent = '›';
+
+        card.append(title, icon);
+        card.addEventListener('click', () => openDetailModal(item.id));
+        card.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter') openDetailModal(item.id);
+        });
+        fragment.appendChild(card);
       });
+      els.chemicalList.appendChild(fragment);
+    }
+
+    function showEmptyMessage(message) {
+      els.chemicalList.textContent = '';
+      const box = document.createElement('div');
+      box.className = 'text-center text-muted my-4 p-4 bg-white';
+      box.style.borderRadius = '15px';
+      box.textContent = message;
+      els.chemicalList.appendChild(box);
     }
 
     function filterData() {
-      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-      const selectedBrand = document.getElementById('brandFilter').value;
-      const selectedType = document.getElementById('typeFilter').value;
+      const searchTerm = els.searchInput.value.toLowerCase().trim();
+      const selectedBrand = els.brandFilter.value;
+      const selectedType = els.typeFilter.value;
+
       const filtered = globalChemicalData.filter(item => {
-        const matchSearch = item.name.toLowerCase().includes(searchTerm) || item.brand.toLowerCase().includes(searchTerm) || item.type.toLowerCase().includes(searchTerm);
-        const matchBrand = selectedBrand === "" || item.brand === selectedBrand;
-        const matchType = selectedType === "" || item.type === selectedType;
+        const matchSearch = !searchTerm || [item.name, item.brand, item.type].some(v => v.toLowerCase().includes(searchTerm));
+        const matchBrand = selectedBrand === '' || item.brand === selectedBrand;
+        const matchType = selectedType === '' || item.type === selectedType;
         return matchSearch && matchBrand && matchType;
       });
       displayData(filtered);
     }
 
-    // ==========================================
-    // ฟังก์ชันเปิดหน้าต่างรายละเอียดสารเคมี (ใหม่)
-    // ==========================================
-    function openDetailModal(id, name, brand, type, url) {
-      document.getElementById('detailName').innerText = name;
-      document.getElementById('detailBrand').innerText = '🏢 ' + brand;
-      document.getElementById('detailType').innerText = '⚙️ ' + type;
+    function openDetailModal(id) {
+      const item = chemicalById.get(id);
+      if (!item) return;
 
-      let actionHtml = '';
+      els.detailName.textContent = item.name;
+      els.detailBrand.textContent = '🏢 ' + item.brand;
+      els.detailType.textContent = '⚙️ ' + item.type;
+      els.detailActions.textContent = '';
 
-      // ปุ่มดูเอกสาร (มีหรือไม่มีไฟล์)
-      if (url) {
-        actionHtml += `<button class="btn btn-primary w-100 mb-2" style="border-radius:12px; padding: 12px; font-weight: 500;" onclick="openPdf('${url}', '${name}')">📄 ดูเอกสาร SDS</button>`;
+      if (item.url) {
+        const viewBtn = makeButton('📄 ดูเอกสาร SDS', 'btn btn-primary w-100 mb-2');
+        viewBtn.style.borderRadius = '12px';
+        viewBtn.style.padding = '12px';
+        viewBtn.style.fontWeight = '500';
+        viewBtn.addEventListener('click', () => openPdf(item.url, item.name));
+        els.detailActions.appendChild(viewBtn);
       } else {
-        actionHtml += `<button class="btn btn-secondary w-100 mb-2" disabled style="border-radius:12px; padding: 12px; font-weight: 500;">⚠️ รอนำเข้าไฟล์ SDS</button>`;
+        const disabledBtn = makeButton('⚠️ รอนำเข้าไฟล์ SDS', 'btn btn-secondary w-100 mb-2');
+        disabledBtn.disabled = true;
+        disabledBtn.style.borderRadius = '12px';
+        disabledBtn.style.padding = '12px';
+        disabledBtn.style.fontWeight = '500';
+        els.detailActions.appendChild(disabledBtn);
       }
 
-      // ถ้าเป็น Admin โชว์ปุ่มแก้ไขและลบเพิ่ม
       if (currentRole === 'admin') {
-        actionHtml += `
-          <div class="d-flex gap-2">
-            <button class="btn flex-fill" style="background-color: #fff3cd; color: #856404; border-radius: 12px; padding: 10px; font-weight: 500;" onclick="openEditFromDetail('${id}', '${name}', '${brand}', '${type}')">✏️ แก้ไข</button>
-            <button class="btn flex-fill" style="background-color: #ffe5e5; color: #dc3545; border-radius: 12px; padding: 10px; font-weight: 500;" onclick="deleteData('${id}', '${name}')">🗑️ ลบ</button>
-          </div>
-        `;
+        const row = document.createElement('div');
+        row.className = 'd-flex gap-2';
+
+        const editBtn = makeButton('✏️ แก้ไข', 'btn flex-fill');
+        editBtn.style.cssText = 'background-color:#fff3cd;color:#856404;border-radius:12px;padding:10px;font-weight:500;';
+        editBtn.addEventListener('click', () => openEditFromDetail(item.id));
+
+        const deleteBtn = makeButton('🗑️ ลบ', 'btn flex-fill');
+        deleteBtn.style.cssText = 'background-color:#ffe5e5;color:#dc3545;border-radius:12px;padding:10px;font-weight:500;';
+        deleteBtn.addEventListener('click', () => deleteData(item.id));
+
+        row.append(editBtn, deleteBtn);
+        els.detailActions.appendChild(row);
       }
 
-      document.getElementById('detailActions').innerHTML = actionHtml;
-      
-      const detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
-      detailModal.show();
+      new bootstrap.Modal(document.getElementById('detailModal')).show();
     }
 
-    // สลับจากหน้า Detail ไปหน้า Edit
-    function openEditFromDetail(id, name, brand, type) {
-      // ปิดหน้าต่าง Detail ก่อน
-      const detailModalEl = document.getElementById('detailModal');
-      const detailModal = bootstrap.Modal.getInstance(detailModalEl);
-      if(detailModal) detailModal.hide();
-      
-      // เอาค่าไปใส่ในฟอร์มแก้ไข
-      document.getElementById('editId').value = id;
-      document.getElementById('editName').value = name;
-      document.getElementById('editBrand').value = brand;
-      document.getElementById('editType').value = type;
-      document.getElementById('editPdfFile').value = ''; 
-      
-      // เปิดหน้าต่าง Edit
-      setTimeout(() => {
-        new bootstrap.Modal(document.getElementById('editModal')).show();
-      }, 300); // ดีเลย์นิดหน่อยให้ Popup ตัวเก่าปิดสนิทก่อน
+    function makeButton(text, className) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = className;
+      button.textContent = text;
+      return button;
+    }
+
+    function openEditFromDetail(id) {
+      const item = chemicalById.get(id);
+      if (!item) return;
+
+      const detailModal = bootstrap.Modal.getInstance(document.getElementById('detailModal'));
+      if (detailModal) detailModal.hide();
+
+      document.getElementById('editId').value = item.id;
+      document.getElementById('editName').value = item.name;
+      document.getElementById('editBrand').value = item.brand;
+      document.getElementById('editType').value = item.type;
+      document.getElementById('editPdfFile').value = '';
+      els.editStatusMessage.className = 'alert d-none mt-3 mb-0 text-center rounded-3';
+
+      setTimeout(() => new bootstrap.Modal(document.getElementById('editModal')).show(), 300);
+    }
+
+    function validatePdfFile(file) {
+      if (!file) return { ok: false, message: 'กรุณาเลือกไฟล์ PDF' };
+      const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+      if (!isPdf) return { ok: false, message: 'รองรับเฉพาะไฟล์ PDF เท่านั้น' };
+
+      const maxSizeBytes = MAX_FILE_SIZE_MB * 1024 * 1024;
+      if (file.size > maxSizeBytes) return { ok: false, message: `ไฟล์ต้องไม่เกิน ${MAX_FILE_SIZE_MB} MB` };
+      return { ok: true };
+    }
+
+    function readFileAsDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = event => resolve(event.target.result);
+        reader.onerror = () => reject(new Error('อ่านไฟล์ไม่สำเร็จ'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function setStatus(element, type, message) {
+      element.className = `alert d-block alert-${type} mt-3 mb-0 text-center rounded-3`;
+      element.textContent = message;
+    }
+
+    async function handleUpload(event) {
+      event.preventDefault();
+      const file = document.getElementById('pdfFile').files[0];
+      const validation = validatePdfFile(file);
+      if (!validation.ok) return setStatus(els.statusMessage, 'danger', '❌ ' + validation.message);
+
+      els.submitBtn.disabled = true;
+      els.submitBtn.textContent = 'กำลังอัปโหลด...';
+      setStatus(els.statusMessage, 'info', 'กำลังส่งไฟล์เข้าระบบ...');
+
+      try {
+        const base64 = await readFileAsDataUrl(file);
+        await apiRequest('upload', {
+          chemName: document.getElementById('chemName').value.trim(),
+          brand: document.getElementById('chemBrand').value.trim(),
+          type: document.getElementById('chemType').value.trim(),
+          fileName: file.name,
+          base64
+        }, true);
+
+        setStatus(els.statusMessage, 'success', '✅ บันทึกข้อมูลเรียบร้อย');
+        els.uploadForm.reset();
+        await loadData();
+        setTimeout(() => els.statusMessage.classList.add('d-none'), 3000);
+      } catch (error) {
+        setStatus(els.statusMessage, 'danger', '❌ การอัปโหลดล้มเหลว: ' + error.message);
+      } finally {
+        els.submitBtn.disabled = false;
+        els.submitBtn.textContent = 'บันทึกและอัปโหลด PDF';
+      }
     }
 
     async function handleUpdate(event) {
       event.preventDefault();
-      const btn = document.getElementById('updateBtn');
-      const id = document.getElementById('editId').value;
-      const name = document.getElementById('editName').value;
-      const brand = document.getElementById('editBrand').value;
-      const type = document.getElementById('editType').value;
-      const fileInput = document.getElementById('editPdfFile').files[0];
-      const statusDiv = document.getElementById('editStatusMessage');
+      const file = document.getElementById('editPdfFile').files[0];
+      if (file) {
+        const validation = validatePdfFile(file);
+        if (!validation.ok) return setStatus(els.editStatusMessage, 'danger', '❌ ' + validation.message);
+      }
 
-      btn.disabled = true;
-      btn.innerText = "กำลังบันทึกข้อมูล...";
-      statusDiv.className = "alert d-block alert-info mt-3 mb-0";
-      statusDiv.innerText = fileInput ? "กำลังอัปโหลดไฟล์และอัปเดตข้อมูล..." : "กำลังอัปเดตข้อมูล...";
+      els.updateBtn.disabled = true;
+      els.updateBtn.textContent = 'กำลังบันทึกข้อมูล...';
+      setStatus(els.editStatusMessage, 'info', file ? 'กำลังอัปโหลดไฟล์และอัปเดตข้อมูล...' : 'กำลังอัปเดตข้อมูล...');
 
-      const payload = { action: "update", id: id, chemName: name, brand: brand, type: type };
-
-      const sendUpdate = async (finalPayload) => {
-        try {
-          const response = await fetch(GAS_API_URL, { method: 'POST', body: JSON.stringify(finalPayload), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
-          const result = await response.json();
-          if (result.success) {
-            statusDiv.className = "alert d-block alert-success mt-3 mb-0";
-            statusDiv.innerText = "✅ อัปเดตข้อมูลสำเร็จ";
-            setTimeout(() => {
-              bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
-              loadData();
-              statusDiv.classList.add('d-none');
-            }, 1500);
-          } else throw new Error(result.message);
-        } catch (error) {
-          statusDiv.className = "alert d-block alert-danger mt-3 mb-0";
-          statusDiv.innerText = "❌ อัปเดตไม่สำเร็จ: " + error.message;
-        } finally {
-          btn.disabled = false;
-          btn.innerText = "บันทึกการเปลี่ยนแปลง";
-        }
-      };
-
-      if (fileInput) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          payload.fileName = fileInput.name;
-          payload.base64 = e.target.result;
-          sendUpdate(payload);
+      try {
+        const payload = {
+          id: document.getElementById('editId').value,
+          chemName: document.getElementById('editName').value.trim(),
+          brand: document.getElementById('editBrand').value.trim(),
+          type: document.getElementById('editType').value.trim()
         };
-        reader.readAsDataURL(fileInput);
-      } else { sendUpdate(payload); }
+
+        if (file) {
+          payload.fileName = file.name;
+          payload.base64 = await readFileAsDataUrl(file);
+        }
+
+        await apiRequest('update', payload, true);
+        setStatus(els.editStatusMessage, 'success', '✅ อัปเดตข้อมูลสำเร็จ');
+        setTimeout(async () => {
+          bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+          await loadData();
+          els.editStatusMessage.classList.add('d-none');
+        }, 1200);
+      } catch (error) {
+        setStatus(els.editStatusMessage, 'danger', '❌ อัปเดตไม่สำเร็จ: ' + error.message);
+      } finally {
+        els.updateBtn.disabled = false;
+        els.updateBtn.textContent = 'บันทึกการเปลี่ยนแปลง';
+      }
     }
 
-    async function deleteData(id, name) {
-      if(!confirm(`⚠️ ต้องการลบข้อมูลของ "${name}" ใช่หรือไม่?`)) return;
-      
-      // ถ้าลบจากหน้า Detail ให้ปิดหน้าต่าง Detail ด้วย
-      const detailModalEl = document.getElementById('detailModal');
-      const detailModal = bootstrap.Modal.getInstance(detailModalEl);
-      if(detailModal) detailModal.hide();
+    async function deleteData(id) {
+      const item = chemicalById.get(id);
+      if (!item) return;
+      if (!confirm(`⚠️ ต้องการลบข้อมูลของ "${item.name}" ใช่หรือไม่?`)) return;
 
-      document.getElementById('loader').style.display = 'block';
+      const detailModal = bootstrap.Modal.getInstance(document.getElementById('detailModal'));
+      if (detailModal) detailModal.hide();
+
+      els.loader.style.display = 'block';
       try {
-        const response = await fetch(GAS_API_URL, { method: 'POST', body: JSON.stringify({ action: "delete", id: id }), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
-        const result = await response.json();
-        if(result.success) loadData();
-        else alert('เกิดข้อผิดพลาด: ' + result.message);
-      } catch(e) { alert('ระบบขัดข้อง'); }
+        await apiRequest('delete', { id }, true);
+        await loadData();
+      } catch (error) {
+        alert('ลบข้อมูลไม่สำเร็จ: ' + error.message);
+      } finally {
+        els.loader.style.display = 'none';
+      }
+    }
+
+    function isSafeUrl(url) {
+      try {
+        const parsed = new URL(url);
+        return parsed.protocol === 'https:';
+      } catch (_) {
+        return false;
+      }
     }
 
     function openPdf(url, name) {
-      // ซ่อนหน้า Detail ก่อนเปิด PDF
-      const detailModalEl = document.getElementById('detailModal');
-      const detailModal = bootstrap.Modal.getInstance(detailModalEl);
-      if(detailModal) detailModal.hide();
+      if (!isSafeUrl(url)) {
+        alert('URL ของเอกสารไม่ถูกต้องหรือไม่ปลอดภัย');
+        return;
+      }
 
-      document.getElementById('pdfModalTitle').innerText = name;
-      document.getElementById('pdfFrame').src = url; 
-      
-      setTimeout(() => {
-        new bootstrap.Modal(document.getElementById('pdfModal')).show();
-      }, 300);
+      const detailModal = bootstrap.Modal.getInstance(document.getElementById('detailModal'));
+      if (detailModal) detailModal.hide();
+
+      els.pdfModalTitle.textContent = name;
+      els.pdfFrame.src = url;
+      setTimeout(() => new bootstrap.Modal(document.getElementById('pdfModal')).show(), 300);
     }
-    
-    function closePdf() { document.getElementById('pdfFrame').src = ""; }
 
-    async function handleUpload(event) {
-      event.preventDefault();
-      const btn = document.getElementById('submitBtn'), statusDiv = document.getElementById('statusMessage');
-      const fileInput = document.getElementById('pdfFile').files[0];
-      if (!fileInput) return;
-
-      btn.disabled = true;
-      btn.innerText = "กำลังอัปโหลด...";
-      statusDiv.className = "alert d-block alert-info mt-3 mb-0";
-      statusDiv.innerText = "กำลังส่งไฟล์เข้าระบบ...";
-
-      const reader = new FileReader();
-      reader.onload = async function(e) {
-        try {
-          const payload = { action: "upload", chemName: document.getElementById('chemName').value, brand: document.getElementById('chemBrand').value, type: document.getElementById('chemType').value, fileName: fileInput.name, base64: e.target.result };
-          const response = await fetch(GAS_API_URL, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
-          const result = await response.json();
-          if (result.success) {
-            statusDiv.className = "alert d-block alert-success mt-3 mb-0";
-            statusDiv.innerText = "✅ บันทึกข้อมูลเรียบร้อย";
-            document.getElementById('uploadForm').reset();
-            loadData();
-            setTimeout(() => statusDiv.classList.add('d-none'), 3000);
-          } else throw new Error(result.message);
-        } catch (error) { statusDiv.className = "alert d-block alert-danger mt-3 mb-0"; statusDiv.innerText = "❌ การอัปโหลดล้มเหลว"; } 
-        finally { btn.disabled = false; btn.innerText = "บันทึกและอัปโหลด PDF"; }
-      };
-      reader.readAsDataURL(fileInput);
+    function closePdf() {
+      els.pdfFrame.src = '';
     }
   </script>
 </body>
