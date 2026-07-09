@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SDS Safety Mobile App - UX V6</title>
+  <title>SDS Safety Mobile App - UX V8</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -140,9 +140,9 @@
 
     .card-chem {
       background: white;
-      border-radius: 20px;
-      margin-bottom: 12px;
-      padding: 16px;
+      border-radius: 16px;
+      margin-bottom: 8px;
+      padding: 14px 16px;
       display: block;
       box-shadow: var(--shadow);
       border: 1px solid rgba(226,232,240,.74);
@@ -157,15 +157,14 @@
       left: 0;
       top: 0;
       bottom: 0;
-      width: 5px;
+      width: 4px;
       background: var(--primary);
     }
     .card-chem.card-ready::before { background: var(--success); }
     .card-chem.card-missing::before { background: var(--danger); }
     .card-chem:active { transform: scale(0.99); background-color: #fbfcfd; }
-    .chem-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
-    .chem-name { font-weight: 600; font-size: 1.12rem; color: var(--primary); margin: 0 0 6px; line-height: 1.28; }
-    .chem-meta { color: var(--muted); font-size: .9rem; margin-bottom: 11px; }
+    .chem-row { display: flex; justify-content: space-between; align-items: center; gap: 14px; }
+    .chem-name { font-weight: 600; font-size: 1.08rem; color: var(--primary); margin: 0; line-height: 1.28; }
     .chem-icon { color: #cbd5e0; font-size: 1.5rem; font-weight: bold; line-height: 1; }
     .status-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
     .status-badge { display: inline-flex; align-items: center; gap: 5px; border-radius: 999px; padding: 5px 10px; font-size: .78rem; font-weight: 500; }
@@ -291,7 +290,7 @@
           <div id="roleIndicator" class="badge rounded-pill text-bg-light">โหมดดูข้อมูล</div>
         </div>
         <h3 class="header-title">SDS Database</h3>
-        <div class="header-subtitle">ค้นหาเอกสารความปลอดภัยและตำแหน่งจัดเก็บสารเคมี</div>
+        <div class="header-subtitle">ค้นหา SDS ด้วยชื่อสารเคมีหรือ Part No. และดูตำแหน่งจัดเก็บ</div>
       </div>
     </div>
 
@@ -315,7 +314,7 @@
 
     <div class="filter-shell">
       <div class="filter-container">
-        <input type="text" id="searchInput" class="form-control search-box" placeholder="🔍 ค้นหาชื่อสารเคมี / ยี่ห้อ / ประเภท...">
+        <input type="text" id="searchInput" class="form-control search-box" placeholder="🔍 ค้นหาชื่อสารเคมี / Part No. / ยี่ห้อ / ประเภท...">
         <div class="filter-group">
           <select id="brandFilter" class="filter-select"><option value="">🏷️ ทุกยี่ห้อ</option></select>
           <select id="typeFilter" class="filter-select"><option value="">🛢️ ทุกประเภท</option></select>
@@ -344,6 +343,7 @@
           <div class="small-note mb-3">รองรับเฉพาะ PDF ไม่เกิน 5 MB</div>
           <form id="uploadForm">
             <div class="mb-3"><label class="form-label small text-muted mb-1">ชื่อสารเคมี</label><input type="text" id="chemName" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label small text-muted mb-1">Part No. <span class="text-muted">(ถ้ามี)</span></label><input type="text" id="chemPartNo" class="form-control" placeholder="เช่น PN-001 / รหัสสินค้า"></div>
             <div class="row mb-3">
               <div class="col-6"><label class="form-label small text-muted mb-1">ยี่ห้อ (Brand)</label><input type="text" id="chemBrand" class="form-control" required></div>
               <div class="col-6"><label class="form-label small text-muted mb-1">ประเภทการใช้งาน</label><input type="text" id="chemType" class="form-control" required></div>
@@ -389,6 +389,7 @@
           <form id="editForm">
             <input type="hidden" id="editId">
             <div class="mb-3"><label class="form-label small text-muted mb-1">ชื่อสารเคมี</label><input type="text" id="editName" class="form-control" style="border-radius: 10px;" required></div>
+            <div class="mb-3"><label class="form-label small text-muted mb-1">Part No. <span class="text-muted">(ถ้ามี)</span></label><input type="text" id="editPartNo" class="form-control" style="border-radius: 10px;" placeholder="เช่น PN-001 / รหัสสินค้า"></div>
             <div class="row mb-3">
               <div class="col-6"><label class="form-label small text-muted mb-1">ยี่ห้อ (Brand)</label><input type="text" id="editBrand" class="form-control" style="border-radius: 10px;" required></div>
               <div class="col-6"><label class="form-label small text-muted mb-1">ประเภทการใช้งาน</label><input type="text" id="editType" class="form-control" style="border-radius: 10px;" required></div>
@@ -537,6 +538,7 @@
       return {
         id: String(item.id || ''),
         name: String(item.name || '-'),
+        partNo: String(item.partNo || '').trim(),
         brand: String(item.brand || '-'),
         type: String(item.type || '-'),
         url: String(item.url || '').trim(),
@@ -680,50 +682,21 @@
         card.className = 'card-chem ' + (item.url ? 'card-ready' : 'card-missing');
         card.setAttribute('role', 'button');
         card.setAttribute('tabindex', '0');
+        card.setAttribute('title', item.partNo ? `${item.name} | Part No. ${item.partNo}` : item.name);
 
         const top = document.createElement('div');
         top.className = 'chem-row';
 
-        const info = document.createElement('div');
         const title = document.createElement('h3');
         title.className = 'chem-name';
         title.textContent = item.name;
 
-        const meta = document.createElement('div');
-        meta.className = 'chem-meta';
-        meta.textContent = `${item.type} / ${item.brand}`;
-
-        info.append(title, meta);
-
         const icon = document.createElement('span');
         icon.className = 'chem-icon';
         icon.textContent = '›';
-        top.append(info, icon);
 
-        const statusRow = document.createElement('div');
-        statusRow.className = 'status-row';
-        statusRow.appendChild(makeStatusBadge(item.url ? '✅ SDS พร้อมใช้งาน' : '⚠️ ยังไม่มี SDS', item.url ? 'badge-ok' : 'badge-missing'));
-        statusRow.appendChild(makeStatusBadge(hasPosition(item) ? '📍 มีตำแหน่ง' : '📍 ยังไม่ระบุตำแหน่ง', hasPosition(item) ? 'badge-position' : 'badge-neutral'));
-
-        const actions = document.createElement('div');
-        actions.className = 'quick-actions';
-
-        const sdsBtn = makeButton('📄 SDS', item.url ? 'btn btn-outline-success' : 'btn btn-outline-secondary');
-        sdsBtn.disabled = !item.url;
-        sdsBtn.addEventListener('click', (event) => {
-          event.stopPropagation();
-          if (item.url) openPdf(item.url, item.name);
-        });
-
-        const posBtn = makeButton('📍 ตำแหน่ง', hasPosition(item) ? 'btn btn-outline-primary' : 'btn btn-outline-secondary');
-        posBtn.disabled = !hasPosition(item) && currentRole !== 'admin';
-        posBtn.addEventListener('click', (event) => {
-          event.stopPropagation();
-          if (hasPosition(item) || currentRole === 'admin') openPositionModal(item.id, currentRole === 'admin');
-        });
-
-        actions.append(sdsBtn, posBtn);
-        card.append(top, statusRow, actions);
+        top.append(title, icon);
+        card.append(top);
         card.addEventListener('click', () => openDetailModal(item.id));
         card.addEventListener('keydown', (event) => {
           if (event.key === 'Enter') openDetailModal(item.id);
@@ -765,7 +738,7 @@
       const selectedType = els.typeFilter.value;
 
       const filtered = globalChemicalData.filter(item => {
-        const matchSearch = !searchTerm || [item.name, item.brand, item.type].some(v => v.toLowerCase().includes(searchTerm));
+        const matchSearch = !searchTerm || [item.name, item.partNo, item.brand, item.type].some(v => String(v || '').toLowerCase().includes(searchTerm));
         const matchBrand = selectedBrand === '' || item.brand === selectedBrand;
         const matchType = selectedType === '' || item.type === selectedType;
         return matchSearch && matchBrand && matchType;
@@ -784,6 +757,7 @@
       els.detailSummary.textContent = '';
 
       els.detailSummary.append(
+        makeSummaryRow('Part No.', item.partNo || '-'),
         makeSummaryRow('สถานะ SDS', item.url ? '✅ พร้อมใช้งาน' : '⚠️ ยังไม่มีไฟล์'),
         makeSummaryRow('ตำแหน่งจัดเก็บ', hasPosition(item) ? '📍 ระบุแล้ว' : 'ยังไม่ได้ระบุ'),
         makeSummaryRow('โหมดการใช้งาน', currentRole === 'admin' ? 'Safety Officer' : 'พนักงานทั่วไป')
@@ -871,6 +845,7 @@
 
       document.getElementById('editId').value = item.id;
       document.getElementById('editName').value = item.name;
+      document.getElementById('editPartNo').value = item.partNo || '';
       document.getElementById('editBrand').value = item.brand;
       document.getElementById('editType').value = item.type;
       document.getElementById('editPdfFile').value = '';
@@ -917,6 +892,7 @@
         const base64 = await readFileAsDataUrl(file);
         await apiRequest('upload', {
           chemName: document.getElementById('chemName').value.trim(),
+          partNo: document.getElementById('chemPartNo').value.trim(),
           brand: document.getElementById('chemBrand').value.trim(),
           type: document.getElementById('chemType').value.trim(),
           fileName: file.name,
@@ -955,6 +931,7 @@
         const payload = {
           id: document.getElementById('editId').value,
           chemName: document.getElementById('editName').value.trim(),
+          partNo: document.getElementById('editPartNo').value.trim(),
           brand: document.getElementById('editBrand').value.trim(),
           type: document.getElementById('editType').value.trim()
         };
